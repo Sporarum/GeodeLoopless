@@ -1,7 +1,8 @@
+/*
 import scala.compiletime._
 import scala.compiletime.ops.int._
 
-/*
+
 sealed trait VectorOld[T, A <: Arity]{
   def apply[At <: Arity](index: At): T
 }

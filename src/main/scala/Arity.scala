@@ -1,0 +1,2 @@
+
+type Arity = Int //& Singleton

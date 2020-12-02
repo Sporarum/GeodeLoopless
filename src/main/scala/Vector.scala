@@ -1,19 +1,15 @@
-import scala.compiletime._
+import scala.compiletime.S
 import scala.compiletime.ops.int._
 import scala.quoted._
 
-
-
-
-type Arity = Int & Singleton
 
 trait Vector[T, A <: Arity]{
   def apply[At <: Arity](index: At): T
 }
 case object VNil                                          extends Vector[Any, 0]{
-  def apply[At <: Arity](index: At): Unit = Unit
+  def apply[At <: Arity](index: At): Unit = ()
 }
-case class Con[T, A <: Arity](head: T, tail: Vector[T,A]) extends Vector[T, S[A]]{
+case class Cons[T, A <: Arity](head: T, tail: Vector[T,A]) extends Vector[T, S[A]]{
 
   def apply[At <: Arity](index: At): T = {
     //val arityCheck: At <= A = true
@@ -25,8 +21,8 @@ case class Con[T, A <: Arity](head: T, tail: Vector[T,A]) extends Vector[T, S[A]
       tail.apply(nIndex)
     }
   }
-}
 
-def dirtyTrick(i: Int): Arity = {
-  return i
+  private def dirtyTrick(i: Int): Arity = {
+    return i
+  }
 }
