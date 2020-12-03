@@ -2,4 +2,4 @@
 
 ### Description
 
-This is an attempt to create a type enforced framework to create and manipulate Primitive Recursive functions and sets in Scala.
+This is an attempt to develop a type enforced framework to create and manipulate Primitive Recursive functions and sets in Scala.
