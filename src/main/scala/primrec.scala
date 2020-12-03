@@ -4,6 +4,11 @@ trait PrimRecFun[A <: Arity] {
   def apply(args: Vector[Nat, A]): Nat
 }
 
+
+case class Const[A <: Arity](val constant: Nat) extends PrimRecFun[A] {
+  def apply(args: V) = constant
+}
+
 case class Proj[A <: Arity](val n: Arity) extends PrimRecFun[A] {
   def apply(args: V) = args(n)
 }
