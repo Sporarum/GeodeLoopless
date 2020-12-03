@@ -2,10 +2,9 @@
 object Main {
 
   def main(args: Array[String]): Unit = {
-    println("Hello world!")
-    println(msg)
+    val proj: PrimRecFun[2] = Proj(3)
+    val res = proj(Vector(Nat(1), Nat(4)))
+    println(res)
   }
-
-  def msg = "I was compiled by dotty :)"
 
 }

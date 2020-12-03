@@ -12,7 +12,7 @@ object Vector{
   def apply[T](e0: T, e1: T): Vector[T, 2] = Cons(e0, Vector(e1))
 }
 
-case class VNil[T]()                                         extends Vector[T, 0]{
+case class VNil[T]()                                       extends Vector[T, 0]{
   def apply[At <: Arity](index: At): T = throw new IllegalArgumentException(f"Acces on index ${index} of an empty Vector (This means your index was ${index+1} bigger than the size of your Vector)")
 }
 case class Cons[T, A <: Arity](head: T, tail: Vector[T,A]) extends Vector[T, S[A]]{
