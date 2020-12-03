@@ -4,6 +4,7 @@ import scala.quoted._
 
 trait Vector[T, A <: Arity]{
   def apply[At <: Arity](index: At): T
+  def map[U](f: T => U): Vector[U, A]
 }
 
 object Vector{
@@ -14,6 +15,7 @@ object Vector{
 
 case class VNil[T]()                                       extends Vector[T, 0]{
   def apply[At <: Arity](index: At): T = throw new IllegalArgumentException(f"Acces on index ${index} of an empty Vector (This means your index was ${index+1} bigger than the size of your Vector)")
+  def map[U](f: T => U) = VNil[U]()
 }
 case class Cons[T, A <: Arity](head: T, tail: Vector[T,A]) extends Vector[T, S[A]]{
 
@@ -32,4 +34,6 @@ case class Cons[T, A <: Arity](head: T, tail: Vector[T,A]) extends Vector[T, S[A
   private def dirtyTrick(i: Int): Arity = {
     return i
   }
+
+  def map[U](f: T => U) = Cons(f(head), tail.map(f))
 }
