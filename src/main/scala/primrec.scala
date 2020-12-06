@@ -3,26 +3,42 @@ import scala.compiletime.S
 trait PrimRecFun[A <: Arity] {
   type V = Vector[Nat, A]
   def apply(args: Vector[Nat, A]): Nat
+  def debug(args: Vector[Nat, A]): (Nat, String) //Prints to console !
 }
 
 //f(X) = c
 case class Const[A <: Arity](val constant: Nat) extends PrimRecFun[A] {
   def apply(args: V) = constant
+  def debug(args: V) =
+    (apply(args), f"Const($constant) on args: $args") //print arity ?
 }
 
 //f(X) = x_n
 case class Proj[A <: Arity](val n: Arity) extends PrimRecFun[A] {
   def apply(args: V) = args(n)
+  def debug(args: V) =
+    (apply(args), f"Proj($n) on args: $args")
 }
 
 //f(x) = Succ(x)
 case object Succ extends PrimRecFun[1] {
   def apply(args: V) = SuccNat(args(0))
+  def debug(args: V) =
+    (apply(args), f"Succ on args: $args") 
 }
 
 //f(X) = g(f_1(X), f_2(X), ... , f_A1(X)) with X a vector of arity A2
 case class Comp[A1 <: Arity, A2 <: Arity](g: PrimRecFun[A1], fs: Vector[PrimRecFun[A2], A1]) extends PrimRecFun[A2]{
   def apply(args: V) = g(fs.map(_(args)))
+  def debug(args: V) =
+    val n = '\n'
+    val start = f"Comp on args: $args {$n"
+    val (resultsFs, strings) = fs.map(_.debug(args)).unzip
+    val stringsWithNames = strings.toList().zipWithIndex.map{case (s, m) => f"f_$m:{$n$s$n}"}
+    val stringFs: String = stringsWithNames.mkString(start=start, sep="\n", end=f"}$n")
+    val (resultG, stringG) = g.debug(resultsFs)
+    (resultG, start ++ stringFs ++ f"g:{$n$stringG$n}: $resultG")
+
 }
 
 // f(0 *: X) = init(X) with X a vector of arity A1
@@ -35,11 +51,29 @@ case class Rec[A1 <: Arity](init: PrimRecFun[A1], step: PrimRecFun[S[S[A1]]]) ex
       case ZeroNat => init(tail)
       case SuccNat(n) =>
         step(this.apply(n *: tail) *: n *: tail )
+
+  def debug(args: V) =
+    val n = '\n'
+    def debug_(args: V): (Nat, String) =
+      val head = args.head()
+      val tail: Vector[Nat, A1] = args.tail()
+      head match
+        case ZeroNat => 
+          val (res, s) = init.debug(tail)
+          (res, f"Rec calls init: {$n$s$n}: $res")
+        case SuccNat(pred) =>
+          val (recRes, recS) = debug_(pred *: tail)
+          val (stepRes, stepS) = step.debug(recRes *: pred *: tail)
+          (stepRes, recS ++ "\n" ++ f"Rec calls step: {$n$stepS$n}: $stepRes")
+
+    val (res, s) = debug_(args)
+    (res, f"Rec on args: $args {$n$s$n}: $res")
+    
 }
 
-case class PrimRecSet[A <: Arity](fun: PrimRecFun[A]) {
+case class PrimRecSet[A <: Arity](chi: PrimRecFun[A]) {
   def contains(elem: Vector[Nat, A]): Boolean = 
-    fun(elem) match {
+    chi(elem) match {
       case ZeroNat => false 
       case _ => true
     }
