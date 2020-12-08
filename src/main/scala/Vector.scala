@@ -18,6 +18,9 @@ trait Vector[T, A <: Arity]{
   def mkString_(sep: String, end: String): String //TODO: add protected or something
   def toList(): List[T]
   def unzip[T1, T2](implicit asPair: T => (T1, T2)): (Vector[T1, A], Vector[T2, A])
+
+  override def toString(): String = this.mkString("Vector(", ", ", ")")
+
   inline def *: (x: T): Vector[T, S[A]] = Cons(x, this)
 }
 
@@ -51,7 +54,7 @@ case class Cons[T, A <: Arity](h: T, t: Vector[T,A]) extends Vector[T, S[A]]{
   def head() = h
   def tail() = t
   def mkString(start: String = "", sep: String = "", end: String = ""): String = 
-    start ++ h.toString ++ t.mkString(sep, end)
+    start ++ h.toString ++ t.mkString_(sep, end)
   def mkString_(sep: String, end: String): String = 
     sep ++ h.toString ++ t.mkString_(sep,end)
   def toList() = h :: t.toList()

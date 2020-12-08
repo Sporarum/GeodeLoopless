@@ -2,11 +2,41 @@ import scala.compiletime.S
 
 trait PrimRecFun[A <: Arity] {
   type V = Vector[Nat, A]
-  def apply(args: Vector[Nat, A]): Nat
-  def debug(args: Vector[Nat, A]): (Nat, String) //Prints to console !
+  def apply(args: V): Nat
+  def debug(args: V): (Nat, String)
+  def prettyDebug(args: V): String =
+    def indent(s: String, ammount: Int) = tab * ammount ++ s //++ f" t:$ammount"
+    def indentFromBraces(s: List[String], depth: Int = 0): List[String] =
+      s match {
+        case h :: tail if h endsWith "{" =>
+          indent(h, depth) :: indentFromBraces(tail, depth+1)
+        case h :: tail if h startsWith "}"=>
+          if (depth == 0)
+            throw new IllegalStateException("unmatched closing brace")
+          else
+            indent(h, depth-1) :: indentFromBraces(tail, depth-1)
+        case h :: tail => 
+          indent(h, depth) :: indentFromBraces(tail, depth)
+        case Nil =>
+          if (depth != 0)
+            List(f"!!!$depth unmatched oppening brace${if(depth > 1) "s" else ""}!!!")
+          else
+            Nil
+      }
+    val string = debug(args)._2
+    indentFromBraces(string.split("\n").toList).mkString("\n")
+  private val tab = "  "
 }
 
-//f(X) = c
+case class UserDefined[A <: Arity](name: String, f: PrimRecFun[A]) extends PrimRecFun[A] {
+  def apply(args: V) = f(args)
+  def debug(args: V) = 
+    val res = f(args)
+    val n = "\n"
+    (res, f"Function $name on args: $args${n}Returned: $res")
+}
+
+//f(X) = constant
 case class Const[A <: Arity](val constant: Nat) extends PrimRecFun[A] {
   def apply(args: V) = constant
   def debug(args: V) =
@@ -34,10 +64,10 @@ case class Comp[A1 <: Arity, A2 <: Arity](g: PrimRecFun[A1], fs: Vector[PrimRecF
     val n = '\n'
     val start = f"Comp on args: $args {$n"
     val (resultsFs, strings) = fs.map(_.debug(args)).unzip
-    val stringsWithNames = strings.toList().zipWithIndex.map{case (s, m) => f"f_$m:{$n$s$n}"}
-    val stringFs: String = stringsWithNames.mkString(start=start, sep="\n", end=f"}$n")
+    val stringsWithNames = strings.toList().zipWithIndex.map{case (s, m) => f"f_$m: {$n$s$n}"} //add result after } ?
+    val stringFs: String = stringsWithNames.mkString(start="", sep="\n", end=f"$n")
     val (resultG, stringG) = g.debug(resultsFs)
-    (resultG, start ++ stringFs ++ f"g:{$n$stringG$n}: $resultG")
+    (resultG, start ++ stringFs ++ f"g: {$n$stringG$n}: $resultG" ++ f"$n}: $resultG")
 
 }
 

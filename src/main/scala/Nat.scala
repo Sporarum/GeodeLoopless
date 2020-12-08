@@ -1,7 +1,9 @@
 
 
 
-trait Nat(val int: Int)
+trait Nat(val int: Int){
+  override def toString(): String = f"$int"
+}
 case object ZeroNat            extends Nat(0)
 case class  SuccNat(nat: Nat)  extends Nat(nat.int + 1)
 
