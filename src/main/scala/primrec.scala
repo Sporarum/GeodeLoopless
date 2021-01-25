@@ -4,7 +4,7 @@ trait PrimRecFun[A <: Arity] {
   type V = Vector[Nat, A]
   def apply(args: V): Nat
   def debug(args: V): (Nat, String) = this match{
-    case UserDefined(_, f) => f.debug_(args) //If we are debugging A user defined, debug the inside
+    case UserDefined(_, f) => f.debug_(args) //If we are debugging a user defined function, debug the inside
     case _ => this.debug_(args)
   }
   def debug_(args: V): (Nat, String)
@@ -17,7 +17,7 @@ trait PrimRecFun[A <: Arity] {
 case class UserDefined[A <: Arity](name: String, f: PrimRecFun[A]) extends PrimRecFun[A] {
   def apply(args: V) = f(args)
   def debug_(args: V) = 
-    val res = f(args) //hides the encased complexity for debugging
+    val res = apply(args) //hides the encased complexity for debugging
     val n = "\n"
     (res, f"Function $name on args: $args${n}Returned: $res")
 }
@@ -57,8 +57,8 @@ case class Comp[A1 <: Arity, A2 <: Arity](g: PrimRecFun[A1], fs: Vector[PrimRecF
 
 }
 
-// f(X :* 0) = init(X) with X a vector of arity A1
-// f(X :* S(n)) = step(X :* n :* f(X :* n))
+// f(X :+ 0) = init(X) with X a vector of arity A1
+// f(X :+ S(n)) = step(X :+ n :+ f(X :+ n))
 case class Rec[A1 <: Arity](base: PrimRecFun[A1], step: PrimRecFun[S[S[A1]]]) extends PrimRecFun[S[A1]]{
   def apply(args: V) = 
     val last = args.last()
@@ -66,7 +66,7 @@ case class Rec[A1 <: Arity](base: PrimRecFun[A1], step: PrimRecFun[S[S[A1]]]) ex
     last match
       case ZeroNat => base(init)
       case SuccNat(n) =>
-        step(init :* n :* apply(init :* n))
+        step(init :+ n :+ apply(init :+ n))
 
   def debug_(args: V) =
     val n = '\n'
@@ -78,8 +78,8 @@ case class Rec[A1 <: Arity](base: PrimRecFun[A1], step: PrimRecFun[S[S[A1]]]) ex
           val (res, s) = base.debug_(init)
           (res, f"Rec calls init: {$n$s$n}: $res")
         case SuccNat(pred) =>
-          val (recRes, recS) = debug_inner(init :* pred)
-          val (stepRes, stepS) = step.debug_(init :* pred :* recRes)
+          val (recRes, recS) = debug_inner(init :+ pred)
+          val (stepRes, stepS) = step.debug_(init :+ pred :+ recRes)
           (stepRes, recS ++ "\n" ++ f"Rec calls step: {$n$stepS$n}: $stepRes")
 
     val (res, s) = debug_inner(args)
