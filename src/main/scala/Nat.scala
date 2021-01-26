@@ -1,7 +1,7 @@
 
 
 
-trait Nat(val int: Int){
+sealed trait Nat(val int: Int){
   override def toString(): String = f"$int"
 }
 case object ZeroNat            extends Nat(0)
@@ -16,7 +16,7 @@ object Nat {
     }else if( n > 0){
       SuccNat(apply(n-1))
     }else{
-      ???
+      throw new IllegalArgumentException(f"You cannot create a Nat of a negative number !")
     }
     
 }
