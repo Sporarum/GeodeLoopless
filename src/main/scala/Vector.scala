@@ -49,8 +49,8 @@ case object VNil extends Vector[Nothing, 0]{
   def mkString(start: String = "", sep: String = "", end: String = ""): String = start ++ end
   def mkString_(sep: String, end: String): String = end
   def toList() = Nil
-  def unzip[T1, T2](implicit asPair: Nothing => (T1, T2)): (Vector[T1, 0], Vector[T2, 0]) = (VNil, VNil)
-  def appended[U](x: U): Vector[U, 1] = x +: VNil
+  def unzip[T1, T2](implicit asPair: Nothing => (T1, T2)) = (VNil, VNil)
+  def appended[U](x: U) = x +: VNil
 }
 
 final case class +:[+T, A <: Arity](h: T, t: Vector[T,A]) extends Vector[T, S[A]]{
