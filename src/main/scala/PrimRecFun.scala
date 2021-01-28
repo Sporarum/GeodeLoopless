@@ -50,7 +50,7 @@ sealed case class Comp[A1 <: Arity, A2 <: Arity](g: PrimRecFun[A1], fs: Vector[P
     val n = '\n'
     val start = f"Comp on args: $args {$n"
     val (resultsFs, strings) = fs.map(_.debug_(args)).unzip
-    val stringsWithNames = strings.toList().zipWithIndex.map{case (s, m) => f"f_$m: {$n$s$n}"} //add result after } ?
+    val stringsWithNames = strings.toList().zipWithIndex.map{case (s, m) => f"f_$m: {$n$s$n}"} //add result after closing brace ?
     val stringFs: String = stringsWithNames.mkString(start="", sep="\n", end=f"$n")
     val (resultG, stringG) = g.debug_(resultsFs)
     (resultG, start ++ stringFs ++ f"g: {$n$stringG$n}: $resultG" ++ f"$n}: $resultG")
