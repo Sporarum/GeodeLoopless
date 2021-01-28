@@ -14,6 +14,11 @@ type P[A <: Arity] <: Arity = A match {
   //case 0 => typeCheckErrors("")
 }
 
+/*type Simplify[T <: Arity] = T match {
+  
+}*/
+
+
 type <=[A1 <: Arity, A2 <: Arity] = A1 match
   case S[a1] => A2 match
     case S[a2] => a1 <= a2
