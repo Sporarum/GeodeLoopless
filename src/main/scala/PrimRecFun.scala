@@ -1,6 +1,6 @@
 import scala.compiletime.S
 
-trait PrimRecFun[A <: Arity] {
+sealed trait PrimRecFun[A <: Arity] {
   type V = Vector[Nat, A]
   def apply(args: V): Nat
   def debug(args: V): (Nat, String) = this match{
@@ -14,7 +14,7 @@ trait PrimRecFun[A <: Arity] {
     Util.indentFromBraces(string.split("\n").toList).mkString("\n")
 }
 
-case class UserDefined[A <: Arity](name: String, f: PrimRecFun[A]) extends PrimRecFun[A] {
+sealed case class UserDefined[A <: Arity](name: String, f: PrimRecFun[A]) extends PrimRecFun[A] {
   def apply(args: V) = f(args)
   def debug_(args: V) = 
     val res = apply(args) //hides the encased complexity for debugging
@@ -23,14 +23,14 @@ case class UserDefined[A <: Arity](name: String, f: PrimRecFun[A]) extends PrimR
 }
 
 //f(X) = constant
-case class Const[A <: Arity](val constant: Nat) extends PrimRecFun[A] {
+sealed case class Const[A <: Arity](val constant: Nat) extends PrimRecFun[A] {
   def apply(args: V) = constant
   def debug_(args: V) =
     (apply(args), f"Const($constant) on args: $args") //print arity ?
 }
 
 //f(X) = x_n
-case class Proj[A <: Arity](val n: Arity) extends PrimRecFun[A] {
+sealed case class Proj[A <: Arity](val n: Arity) extends PrimRecFun[A] {
   def apply(args: V) = args(n)
   def debug_(args: V) =
     (apply(args), f"Proj($n) on args: $args")
@@ -44,7 +44,7 @@ case object Succ extends PrimRecFun[1] {
 }
 
 //f(X) = g(f_1(X), f_2(X), ... , f_A1(X)) with X a vector of arity A2
-case class Comp[A1 <: Arity, A2 <: Arity](g: PrimRecFun[A1], fs: Vector[PrimRecFun[A2], A1]) extends PrimRecFun[A2]{
+sealed case class Comp[A1 <: Arity, A2 <: Arity](g: PrimRecFun[A1], fs: Vector[PrimRecFun[A2], A1]) extends PrimRecFun[A2]{
   def apply(args: V) = g(fs.map(_(args)))
   def debug_(args: V) =
     val n = '\n'
@@ -59,7 +59,7 @@ case class Comp[A1 <: Arity, A2 <: Arity](g: PrimRecFun[A1], fs: Vector[PrimRecF
 
 // f(X :+ 0) = init(X) with X a vector of arity A1
 // f(X :+ S(n)) = step(X :+ n :+ f(X :+ n))
-case class Rec[A1 <: Arity](base: PrimRecFun[A1], step: PrimRecFun[S[S[A1]]]) extends PrimRecFun[S[A1]]{
+sealed case class Rec[A1 <: Arity](base: PrimRecFun[A1], step: PrimRecFun[S[S[A1]]]) extends PrimRecFun[S[A1]]{
   def apply(args: V) = 
     val last = args.last()
     val init: Vector[Nat, A1] = args.init()
@@ -104,11 +104,3 @@ extension [A0 <: Arity] (g: PrimRecFun[3])
     g.on(f0,f1,f2)
   def on(f0: PrimRecFun[A0], f1: PrimRecFun[A0], f2: PrimRecFun[A0]) =
     Comp[3, A0](g, f0 +: f1 +: f2 +: VNil)
-
-case class PrimRecSet[A <: Arity](chi: PrimRecFun[A]) {
-  def contains(elem: Vector[Nat, A]): Boolean = 
-    chi(elem) match {
-      case ZeroNat => false 
-      case _ => true
-    }
-}
