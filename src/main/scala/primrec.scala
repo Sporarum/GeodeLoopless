@@ -87,6 +87,24 @@ case class Rec[A1 <: Arity](base: PrimRecFun[A1], step: PrimRecFun[S[S[A1]]]) ex
     
 }
 
+extension [A0 <: Arity] (g: PrimRecFun[1])
+  def apply(f0: PrimRecFun[A0]) =
+    g.on(f0)
+  def on(f0: PrimRecFun[A0]) =
+    Comp[1, A0](g, Vector(f0))
+
+extension [A0 <: Arity] (g: PrimRecFun[2])
+  def apply(f0: PrimRecFun[A0], f1: PrimRecFun[A0]) =
+    g.on(f0, f1)
+  def on(f0: PrimRecFun[A0], f1: PrimRecFun[A0]) =
+    Comp[2, A0](g, f0 +: f1 +: VNil)
+
+extension [A0 <: Arity] (g: PrimRecFun[3])
+  def apply(f0: PrimRecFun[A0], f1: PrimRecFun[A0], f2: PrimRecFun[A0]) =
+    g.on(f0,f1,f2)
+  def on(f0: PrimRecFun[A0], f1: PrimRecFun[A0], f2: PrimRecFun[A0]) =
+    Comp[3, A0](g, f0 +: f1 +: f2 +: VNil)
+
 case class PrimRecSet[A <: Arity](chi: PrimRecFun[A]) {
   def contains(elem: Vector[Nat, A]): Boolean = 
     chi(elem) match {
