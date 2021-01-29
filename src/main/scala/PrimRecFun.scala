@@ -87,6 +87,11 @@ sealed case class Rec[A1 <: Arity](base: PrimRecFun[A1], step: PrimRecFun[S[S[A1
     
 }
 
+/*given [A <: Arity] Conversion[Int, Const[A]] with
+  def apply[A <: Arity](n: Int): Const[A] = Const(Nat(n))
+*/
+
+
 extension [A0 <: Arity] (g: PrimRecFun[1])
   def apply(f0: PrimRecFun[A0]) =
     g.on(f0)
