@@ -5,7 +5,7 @@ import annotation.showAsInfix
 import scala.annotation.implicitNotFound
 import scala.quoted._
 
-trait Vector[+T, A <: Arity]{
+trait Vector[+T, A <: Arity]:
   /*@implicitNotFound("index out of bounds")
   type Check[At <: Arity] <: T = A <= At match {
     case true => T
@@ -31,15 +31,15 @@ trait Vector[+T, A <: Arity]{
   inline def +: [U >: T] (x: U): Vector[U, S[A]] = new +:(x, this)
   def :+ [U >: T] (x: U): Vector[U, S[A]] = appended(x)
   def appended[U >: T](x: U): Vector[U, S[A]]
-}
+end Vector
 
-object Vector{
+object Vector:
   def apply[T](): Vector[T, 0] = VNil
   def apply[T](e0: T): Vector[T, 1] = e0 +: Vector()
   def apply[T](e0: T, e1: T): Vector[T, 2] = e0 +: Vector(e1)
-}
 
-case object VNil extends Vector[Nothing, 0]{
+
+case object VNil extends Vector[Nothing, 0]:
   def apply[At <: Arity](index: At) = throw new IllegalArgumentException(f"Acces on index ${index} of an empty Vector (This means your index was ${index+1} bigger than the size of your Vector)")
   def map[U](f: Nothing => U) = VNil
   def head() = throw new IllegalArgumentException(f"Empty Vector has no head")
@@ -51,25 +51,26 @@ case object VNil extends Vector[Nothing, 0]{
   def toList() = Nil
   def unzip[T1, T2](implicit asPair: Nothing => (T1, T2)) = (VNil, VNil)
   def appended[U](x: U) = x +: VNil
-}
 
-final case class +:[+T, A <: Arity](h: T, t: Vector[T,A]) extends Vector[T, S[A]]{
+
+final case class +:[+T, A <: Arity](h: T, t: Vector[T,A]) extends Vector[T, S[A]]:
   def apply[At <: Arity](index: At): T = 
-    if(index == 0){
-      h
-    }else{
+    if index == 0
+    then h
+    else
       val nIndex: P[At] = minusOne(index)
       t.apply(nIndex)
-    }
 
   def map[U](f: T => U) = f(h) +: t.map(f)
   def head() = h
   def tail() = t
+
   def init() =
     def fix[T, A <: Arity](v: Vector[T, S[P[A]]]): Vector[T, A] =  v.asInstanceOf[Vector[T, A]]
     t match
       case VNil => t
       case _ => val res = h +: t.init(); fix(res)
+  
   def last() = 
     t match
       case VNil => h
@@ -85,6 +86,6 @@ final case class +:[+T, A <: Arity](h: T, t: Vector[T,A]) extends Vector[T, S[A]
     val (t1, t2) = t.unzip(asPair)
     (h1 +: t1, h2 +: t2)
 
-  
   def appended[U >: T](x: U): Vector[U, S[S[A]]] = h +: t.appended(x)
-}
+  
+end +:
