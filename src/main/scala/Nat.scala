@@ -20,3 +20,5 @@ object Nat {
     }
     
 }
+
+given Conversion[Int, Nat] = Nat(_)
