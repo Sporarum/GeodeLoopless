@@ -8,5 +8,7 @@ def chi_full[A <: Arity]: PrimRecFun[A] = Const(1)
 def full[A <: Arity] = PrimRecSet(chi_full[A])
 
 
-def greater: PrimRecFun[2] = Const(1) ∸ (Const(1) ∸ (Proj(1) ∸ Proj(0)))
-def greaterSet = PrimRecSet(greater)
+def smaller: PrimRecFun[2] = UserDefined("smaller", sign on (Proj(1) ∸ Proj(0)))
+def smallerSet = PrimRecSet(smaller)
+
+//def equals: PrimRecFun[2] = 
