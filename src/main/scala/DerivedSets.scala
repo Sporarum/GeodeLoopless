@@ -8,5 +8,5 @@ def chi_full[A <: Arity]: PrimRecFun[A] = Const(1)
 def full[A <: Arity] = PrimRecSet(chi_full[A])
 
 
-def greater: PrimRecFun[2] = subDot(Const(1), subDot(Const(1), subDot(Proj(1), Proj(0))))
+def greater: PrimRecFun[2] = Const(1) ∸ (Const(1) ∸ (Proj(1) ∸ Proj(0)))
 def greaterSet = PrimRecSet(greater)
