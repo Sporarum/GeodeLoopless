@@ -1,3 +1,4 @@
+import scala.language.postfixOps
 
 object Main {
 
@@ -15,6 +16,9 @@ object Main {
     val compFromApply1 = Succ(proj)
     
     def compFromApply2[A <: Arity]: PrimRecFun[A] = compFromApply1(Const[A](Nat(0)), Const[A](Nat(4)))
+
+    val plusTest = proj + proj
+    val subDotTest = proj ∸ proj // == ⁼ ₌ ≍ ≌ ≈ ≗ ≝ ≡ ⊢ ⊦ ⊧ ⊩
 
     val vecRev = VNil :+ "Hello World !"
     //val bug = VNil.head()
