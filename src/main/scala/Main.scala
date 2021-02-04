@@ -37,8 +37,9 @@ object Main {
     //val test = vec(4)
     //println(subDotOne.prettyDebug(Nat(10) +: VNil))
     val vec1 = Nat(3) +: VNil
-    val vec2 = Vector(Nat(0), Nat(1))
-    println(smaller.prettyDebug(vec2))
+    val vec2 = Vector(Nat(0), Nat(0))
+    val fun = areEqual
+    println(fun.prettyDebug(vec2))
   }
 
 }

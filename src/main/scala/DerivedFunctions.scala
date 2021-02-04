@@ -14,7 +14,11 @@ def exp(base: Nat): PrimRecFun[1] = UserDefined("exp", Rec(Const(0), Proj(1) * C
 
 def fact: PrimRecFun[1] = UserDefined("fact", Rec(Const(1), Proj(1) * Succ.on(Proj(0))))
 
-def sign: PrimRecFun[1] = UserDefined("sign", Const(1) ∸ (Const(1) ∸ Proj(0)))
+def not: PrimRecFun[1] = UserDefined("not", Const(1) ∸ Proj(0))
+
+def sign: PrimRecFun[1] = UserDefined("sign", not on not on Proj(0))
+
+def diff: PrimRecFun[2] = UserDefined("diff", (Proj[2](0) ∸ Proj(1)) + (Proj[2](1) ∸ Proj(0)))
 
 //f(z *: X) = 0 if for all t <= z: (t *: X) not in A
 def boundedMin[A <: Arity](set: PrimRecSet[A]): PrimRecFun[A] = ???
@@ -29,3 +33,4 @@ extension[A <: Arity] (f0: PrimRecFun[A]):
     inline def ^(n: Nat) = exp(n) on f0
     inline def ! = fact on f0
     //inline def ? = sign on f0 //Keep this ?
+    //inline def unary_¬() = not on f0 // not working for some reason

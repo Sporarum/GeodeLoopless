@@ -11,4 +11,5 @@ def full[A <: Arity] = PrimRecSet(chi_full[A])
 def smaller: PrimRecFun[2] = UserDefined("smaller", sign on (Proj(1) ∸ Proj(0)))
 def smallerSet = PrimRecSet(smaller)
 
-//def equals: PrimRecFun[2] = 
+def areEqual: PrimRecFun[2] = UserDefined("equals", not on diff )
+def areEqualSet = PrimRecSet(areEqual)
