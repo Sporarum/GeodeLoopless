@@ -1,4 +1,6 @@
+import scala.compiletime.S
 import scala.language.implicitConversions
+import scala.language.postfixOps
 
 def identity[A <: Arity](n: A): PrimRecFun[A] = ???
 
@@ -19,6 +21,20 @@ def not: PrimRecFun[1] = UserDefined("not", Const(1) ∸ Proj(0))
 def sign: PrimRecFun[1] = UserDefined("sign", not on not on Proj(0))
 
 def diff: PrimRecFun[2] = UserDefined("diff", (Proj[2](0) ∸ Proj(1)) + (Proj[2](1) ∸ Proj(0)))
+
+
+//A \ B = A ∩ Bᶜ
+// (A ∪ B)ᶜ = Aᶜ ∩ Bᶜ
+//A \ (B ∪ C) = A ∩ (B ∪ C)ᶜ = A ∩ Bᶜ ∩ Cᶜ 
+def caseStudy[A <: Arity, NumSets <: Arity](functions: Vector[PrimRecFun[A], S[NumSets]], sets: Vector[PrimRecSet[A], NumSets]): PrimRecFun[A] = 
+    //full, s0ᶜ, s0ᶜ ∩ s1ᶜ, s0ᶜ ∩ s1ᶜ ∩ s2ᶜ, ...
+    val restrictors = sets.scanLeft(full[A]){case (s0, s1) => s0 ∩ (s1 ᶜ)}
+
+    //s0, s1 \ s0, s2 \ (s0 ∪ s1), ... , full \ (s0 ∪ s1 ∪ ...)
+    val cases = (sets :+ full[A]).zip(restrictors).map{case (set, restrictor) => set ∩ restrictor}
+
+    //x in s0 -> f0(x), x in s1 \ s0 -> f1(s), ...
+    functions.zip(cases).map{case (f, c) => f * c.chi}.fold(Const(0)){case (acc, f) => acc + f}
 
 //f(z *: X) = 0 if for all t <= z: (t *: X) not in A
 def boundedMin[A <: Arity](set: PrimRecSet[A]): PrimRecFun[A] = ???
