@@ -61,8 +61,8 @@ sealed case class Comp[A1 <: Arity, A2 <: Arity](g: PrimRecFun[A1], fs: Vector[P
 // f(X :+ S(n)) = step(X :+ n :+ f(X :+ n))
 sealed case class Rec[A1 <: Arity](base: PrimRecFun[A1], step: PrimRecFun[S[S[A1]]]) extends PrimRecFun[S[A1]]:
   def apply(args: V) = 
-    val last = args.last()
-    val init: Vector[Nat, A1] = args.init()
+    val last = args.last
+    val init: Vector[Nat, A1] = args.init
     last match
       case ZeroNat => base(init)
       case SuccNat(n) =>
@@ -71,8 +71,8 @@ sealed case class Rec[A1 <: Arity](base: PrimRecFun[A1], step: PrimRecFun[S[S[A1
   def debug_(args: V) =
     val n = '\n'
     def debug_inner(args: V): (Nat, String) =
-      val last = args.last()
-      val init: Vector[Nat, A1] = args.init()
+      val last = args.last
+      val init: Vector[Nat, A1] = args.init
       last match
         case ZeroNat => 
           val (res, s) = base.debug_(init)
