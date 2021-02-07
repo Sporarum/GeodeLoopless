@@ -23,6 +23,15 @@ def intersection[A <: Arity](s0: PrimRecSet[A], s1: PrimRecSet[A]): PrimRecSet[A
 
 def complement[A <: Arity](s0: PrimRecSet[A]): PrimRecSet[A] = PrimRecSet(not(s0.chi))
 
+def nDsFrom1Ds[A <: Arity](oneDs: Vector[PrimRecSet[1], A]): PrimRecSet[A] = 
+    //chis of sets where the i'th parameter is in oneDs(i)
+    val projs: Vector[PrimRecFun[A], A] = oneDs.zipWithIndex.map{case (PrimRecSet(chi), i) => chi on Proj[A](i)}
+    //the chi of the intersection of previous chis => set where for all i: the i'th parameter is in oneDs(i)
+    val chi_intersection: PrimRecFun[A] = projs.fold(Const(1)){case (f0, f1) => f0 * f1}
+    PrimRecSet(chi_intersection)
+
+def nDSingleton[A <: Arity](nats: Vector[Nat, A]): PrimRecSet[A] = nDsFrom1Ds(nats.map(singleton(_)))
+
 extension[A <: Arity] (s0: PrimRecSet[A]):
     inline def ∪(s1: PrimRecSet[A]) = union(s0,s1)
     inline def ∩(s1: PrimRecSet[A]) = intersection(s0,s1)
