@@ -44,9 +44,18 @@ trait Vector[+T, A <: Arity]:
 end Vector
 
 object Vector:
+  def fix[T, A <: Arity](v: Vector[T, S[P[A]]]): Vector[T, A] =  v.asInstanceOf[Vector[T, A]]
+
   def apply[T](): Vector[T, 0] = VNil
   def apply[T](e0: T): Vector[T, 1] = e0 +: Vector()
   def apply[T](e0: T, e1: T): Vector[T, 2] = e0 +: Vector(e1)
+
+  def filled[T, A <: Arity](elem: T, times: A): Vector[T,A] =
+    if times == 0 
+    then VNil.asInstanceOf[Vector[Nothing, A]] //A will always equal 0 (or Int)
+    else
+      fix(elem +: filled(elem, minusOne(times)))
+
 
 
 case object VNil extends Vector[Nothing, 0]:
@@ -81,10 +90,9 @@ final case class +:[+T, A <: Arity](h: T, t: Vector[T,A]) extends Vector[T, S[A]
   def tail = t
 
   def init =
-    def fix[T, A <: Arity](v: Vector[T, S[P[A]]]): Vector[T, A] =  v.asInstanceOf[Vector[T, A]]
     t match
       case VNil => t
-      case _ => val res = h +: t.init; fix(res)
+      case _ => val res = h +: t.init; Vector.fix(res)
   
   def last = 
     t match
