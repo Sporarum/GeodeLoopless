@@ -21,7 +21,7 @@ def union[A <: Arity](s0: PrimRecSet[A], s1: PrimRecSet[A]): PrimRecSet[A] = Pri
 
 def intersection[A <: Arity](s0: PrimRecSet[A], s1: PrimRecSet[A]): PrimRecSet[A] = PrimRecSet(s0.chi * s1.chi)
 
-def complement[A <: Arity](s0: PrimRecSet[A]) = PrimRecSet(not(s0.chi))
+def complement[A <: Arity](s0: PrimRecSet[A]): PrimRecSet[A] = PrimRecSet(not(s0.chi))
 
 extension[A <: Arity] (s0: PrimRecSet[A]):
     inline def ∪(s1: PrimRecSet[A]) = union(s0,s1)
