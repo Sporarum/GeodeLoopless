@@ -50,11 +50,17 @@ object Vector:
   def apply[T](e0: T): Vector[T, 1] = e0 +: Vector()
   def apply[T](e0: T, e1: T): Vector[T, 2] = e0 +: Vector(e1)
 
-  def filled[T, A <: Arity](elem: T, times: A): Vector[T,A] =
-    if times == 0 
-    then VNil.asInstanceOf[Vector[Nothing, A]] //A will always equal 0 (or Int)
+  def filled[T, A <: Arity](times: A, elem: T): Vector[T,A] = filled(times)(_ => elem)
+
+  def filled[T, A <: Arity](times: A)(f: Arity => T): Vector[T,A] =
+    if times == 0 then 
+      //A will always equal 0 (or Int)
+      VNil.asInstanceOf[Vector[Nothing, A]] 
     else
-      fix(elem +: filled(elem, minusOne(times)))
+      val tMin1: P[A] = minusOne(times)
+      val init = filled[T,P[A]](tMin1)(f)
+      //if not times-1, will result in vect(0) != f(0)
+      fix(init :+ f(tMin1))
 
 
 
