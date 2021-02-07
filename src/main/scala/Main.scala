@@ -39,7 +39,7 @@ object Main {
     val vec1 = Nat(3) +: VNil
     val vec2 = Vector(Nat(0), Nat(0))
     val fun = areEqual
-    println(fun.prettyDebug(vec2))
+    println( (∅[1]ᶜ) contains vec1)
   }
 
 }
