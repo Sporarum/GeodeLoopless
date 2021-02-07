@@ -22,9 +22,12 @@ trait Vector[+T, A <: Arity]:
   def last: T
 
   def reverse: Vector[T, A]
-  def fold[U >: T](z: U)(op: (U,U) => U): U
+  def fold[U >: T](z: U)(op: (U,U) => U): U = foldLeft(z)(op)
   def foldLeft[U](z: U)(op: (U, T) => U): U
   def foldRight[U](z: U)(op: (T, U) => U): U = reverse.foldLeft(z){case (u, t) => op(t, u)}
+  def scan[U >: T](z: U)(op: (U,U) => U): Vector[U, S[A]] = scanLeft(z)(op)
+  def scanLeft[U](z: U)(op: (U, T) => U): Vector[U, S[A]]
+  def scanRight[U](z: U)(op: (T, U) => U): Vector[U, S[A]] = reverse.scanLeft(z){case (u, t) => op(t, u)}.reverse
   def mkString(start: String = "", sep: String = "", end: String = ""): String
   def mkString_(sep: String, end: String): String //TODO: add protected or something
   def toList(): List[T]
@@ -54,8 +57,8 @@ case object VNil extends Vector[Nothing, 0]:
   def init = throw new IllegalArgumentException(f"Empty Vector has no init")
   def last = throw new IllegalArgumentException(f"Empty Vector has no last")
   def reverse = VNil
-  def fold[U >: Nothing](z: U)(op: (U,U) => U) = z
-  def foldLeft[U](z: U)(op: (U, Nothing) => U): U = z
+  def scanLeft[U](z: U)(op: (U, Nothing) => U) = z +: VNil
+  def foldLeft[U](z: U)(op: (U, Nothing) => U) = z
   def mkString(start: String = "", sep: String = "", end: String = ""): String = start ++ end
   def mkString_(sep: String, end: String): String = end
   def toList() = Nil
@@ -89,9 +92,9 @@ final case class +:[+T, A <: Arity](h: T, t: Vector[T,A]) extends Vector[T, S[A]
       case _ => t.last
   def reverse = t.reverse :+ h
 
-  def fold[U >: T](z: U)(op: (U,U) => U) =
-    op(h, t.fold(z)(op))
   def foldLeft[U](z: U)(op: (U, T) => U) = t.foldLeft(op(z,h))(op)
+
+  def scanLeft[U](z: U)(op: (U, T) => U) = z +: t.scanLeft(op(z,h))(op)
 
   def mkString(start: String = "", sep: String = "", end: String = ""): String = 
     start ++ h.toString ++ t.mkString_(sep, end)
