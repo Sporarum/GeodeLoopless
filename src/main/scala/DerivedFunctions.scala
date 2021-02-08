@@ -50,7 +50,7 @@ def max: PrimRecFun[2] = UserDefined("min",
 def exclusiveFold[A <: Arity](z: PrimRecFun[P[A]], combine: PrimRecFun[2], leaf: PrimRecFun[A])(using a: A): PrimRecFun[A] =
     // X :+ t :+ acc -> leaf(X :+ t)
     def leafTweaked: PrimRecFun[S[A]] = Comp(leaf, Vector.filled[PrimRecFun[S[A]], A](a)(i => Proj(i))) //TODO: replace when variable substitution added
-    // X :+ t :+ acc -> leaf(X :+ t) + acc
+    // X :+ t :+ acc -> combine(leaf(X :+ t), acc)
     def caseSn: PrimRecFun[S[A]] = combine(leafTweaked, Proj(a))
     // fold(X :+ 0) -> z(X)
     // fold(X :+ S(t)) -> combine(leaf(X :+ t), fold(X :+ t))
