@@ -36,7 +36,16 @@ def caseStudy[A <: Arity, NumSets <: Arity](functions: Vector[PrimRecFun[A], S[N
     //x in s0 -> f0(x), x in s1 \ s0 -> f1(s), ...
     functions.zip(cases).map{case (f, c) => f * c.chi}.fold(Const(0)){case (acc, f) => acc + f}
 
-//X :+ y -> sum from t=0 to t=y of f(X :+ t)
+def min: PrimRecFun[2] = UserDefined("min", 
+    caseStudy(
+        Proj[2](0) +: Proj[2](1) +: VNil, 
+        smallerSet +: VNil
+    ))
+def max: PrimRecFun[2] = UserDefined("min", 
+    caseStudy(
+        Proj[2](1) +: Proj[2](0) +: VNil, 
+        smallerSet +: VNil
+    ))
 def sum[A <: Arity](f: PrimRecFun[A])(using a: A): PrimRecFun[A] =
     def case0 = Const[P[A]](0)
     // X :+ t :+ acc -> f(X :+ t)
