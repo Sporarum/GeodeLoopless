@@ -47,6 +47,17 @@ def sum[A <: Arity](f: PrimRecFun[A])(using a: A): PrimRecFun[A] =
     // sum(X :+ S(t)) -> f(X :+ t) + sum(X :+ t)
     Rec(case0, caseSn)
 
+//X :+ y -> product from t=0 to t=y of f(X :+ t)
+def product[A <: Arity](f: PrimRecFun[A])(using a: A): PrimRecFun[A] =
+    def case0 = Const[P[A]](0)
+    // X :+ t :+ acc -> f(X :+ t)
+    def fTweaked: PrimRecFun[S[A]] = Comp(f, Vector.filled[PrimRecFun[S[A]], A](a)(i => Proj(i))) //TODO: replace when variable substitution added
+    // X :+ t :+ acc -> f(X :+ t) + acc
+    def caseSn: PrimRecFun[S[A]] = fTweaked * Proj(a)
+    // sum(X :+ 0) -> 0
+    // sum(X :+ S(t)) -> f(X :+ t) * sum(X :+ t)
+    Rec(case0, caseSn)
+
 //f(z *: X) = 0 if for all t <= z: (t *: X) not in A
 def boundedMin[A <: Arity](set: PrimRecSet[A]): PrimRecFun[A] = ???
 
