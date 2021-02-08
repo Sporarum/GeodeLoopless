@@ -54,30 +54,33 @@ sealed case class Comp[A1 <: Arity, A2 <: Arity](g: PrimRecFun[A1], fs: Vector[P
     val (resultG, stringG) = g.debug_(resultsFs)
     (resultG, s"Comp on args: $args {\n$stringFs\ng: {\n$stringG\n}: $resultG\n}: $resultG")
 
-
-// f(X :+ 0) = init(X) with X a vector of arity A1
+// f(X :+ 0) = init(X) with X a vector of arity A
 // f(X :+ S(n)) = step(X :+ n :+ f(X :+ n))
-sealed case class Rec[A1 <: Arity](base: PrimRecFun[A1], step: PrimRecFun[S[S[A1]]]) extends PrimRecFun[S[A1]]:
+sealed case class Rec[A <: Arity](base: PrimRecFun[P[A]], step: PrimRecFun[S[A]]) extends PrimRecFun[A]:
   def apply(args: V) = 
-    val last = args.last
-    val init: Vector[Nat, A1] = args.init
+    val args_ = args.toSPA()
+    val last = args_.last
+    val init: Vector[Nat, P[A]] = args_.init
     last match
       case ZeroNat => base(init)
-      case SuccNat(n) =>
-        step(init :+ n :+ apply(init :+ n))
+      case SuccNat(pred) =>
+        val nArgs = (init :+ pred).toA()
+        step(nArgs :+ apply(nArgs))
 
   def debug_(args: V) =
     def debug_inner(args: V): (Nat, String) =
-      val last = args.last
-      val init: Vector[Nat, A1] = args.init
+      val args_ = args.toSPA()
+      val last = args_.last
+      val init: Vector[Nat, P[A]] = args_.init
       last match
         case ZeroNat => 
           val (res, s) = base.debug_(init)
           (res, s"Rec calls init: {\n$s\n}: $res")
         case SuccNat(pred) =>
-          val (recRes, recS) = debug_inner(init :+ pred)
-          val (stepRes, stepS) = step.debug_(init :+ pred :+ recRes)
-          (stepRes, recS ++ "\n" ++ f"Rec calls step: {$n$stepS$n}: $stepRes")
+          val nArgs = (init :+ pred).toA()
+          val (recRes, recS) = debug_inner(nArgs)
+          val (stepRes, stepS) = step.debug_(nArgs :+ recRes)
+          (stepRes, recS ++ "\n" ++ s"Rec calls step: {\n$stepS\n}: $stepRes")
 
     val (res, s) = debug_inner(args)
     (res, s"Rec on args: $args {\n$s\n}: $res")
