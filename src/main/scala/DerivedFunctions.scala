@@ -46,6 +46,22 @@ def max: PrimRecFun[2] = UserDefined("min",
         Proj[2](1) +: Proj[2](0) +: VNil, 
         smallerSet +: VNil
     ))
+//X :+ y -> combination from t=0 to t<y of leaf(X :+ t), with z as zero element => combine(leaf(X :+ (y-1)), ... combine(leaf(X :+ 1), combine(leaf(X :+ 0), z))...)
+def exclusiveFold[A <: Arity](z: PrimRecFun[P[A]], combine: PrimRecFun[2], leaf: PrimRecFun[A])(using a: A): PrimRecFun[A] =
+    // X :+ t :+ acc -> leaf(X :+ t)
+    def leafTweaked: PrimRecFun[S[A]] = Comp(leaf, Vector.filled[PrimRecFun[S[A]], A](a)(i => Proj(i))) //TODO: replace when variable substitution added
+    // X :+ t :+ acc -> leaf(X :+ t) + acc
+    def caseSn: PrimRecFun[S[A]] = combine(leafTweaked, Proj(a))
+    // fold(X :+ 0) -> z(X)
+    // fold(X :+ S(t)) -> combine(leaf(X :+ t), fold(X :+ t))
+    Rec(z, caseSn)
+
+//X :+ y -> combination from t=0 to t=y of leaf(X :+ t), with z as zero element => combine(leaf(X :+ y), ... combine(leaf(X :+ 1), combine(leaf(X :+ 0), z))...)
+def fold[A <: Arity](z: PrimRecFun[P[A]], combine: PrimRecFun[2], leaf: PrimRecFun[A])(using a: A): PrimRecFun[A] =
+    //increments y by 1
+    def inc(i: Arity): PrimRecFun[A] = if i == a-1 then Succ(Proj[A](i)) else Proj(i)
+    Comp(exclusiveFold(z, combine, leaf), Vector.filled[PrimRecFun[A], A](a)(inc))
+
 def sum[A <: Arity](f: PrimRecFun[A])(using a: A): PrimRecFun[A] =
     def case0 = Const[P[A]](0)
     // X :+ t :+ acc -> f(X :+ t)
