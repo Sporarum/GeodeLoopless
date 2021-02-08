@@ -36,6 +36,17 @@ def caseStudy[A <: Arity, NumSets <: Arity](functions: Vector[PrimRecFun[A], S[N
     //x in s0 -> f0(x), x in s1 \ s0 -> f1(s), ...
     functions.zip(cases).map{case (f, c) => f * c.chi}.fold(Const(0)){case (acc, f) => acc + f}
 
+//X :+ y -> sum from t=0 to t=y of f(X :+ t)
+def sum[A <: Arity](f: PrimRecFun[A])(using a: A): PrimRecFun[A] =
+    def case0 = Const[P[A]](0)
+    // X :+ t :+ acc -> f(X :+ t)
+    def fTweaked: PrimRecFun[S[A]] = Comp(f, Vector.filled[PrimRecFun[S[A]], A](a)(i => Proj(i))) //TODO: replace when variable substitution added
+    // X :+ t :+ acc -> f(X :+ t) + acc
+    def caseSn: PrimRecFun[S[A]] = fTweaked + Proj(a)
+    // sum(X :+ 0) -> 0
+    // sum(X :+ S(t)) -> f(X :+ t) + sum(X :+ t)
+    Rec(case0, caseSn)
+
 //f(z *: X) = 0 if for all t <= z: (t *: X) not in A
 def boundedMin[A <: Arity](set: PrimRecSet[A]): PrimRecFun[A] = ???
 
