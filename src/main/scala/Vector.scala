@@ -41,10 +41,12 @@ trait Vector[+T, A <: Arity]:
   inline def +: [U >: T] (x: U): Vector[U, S[A]] = new +:(x, this)
   def :+ [U >: T] (x: U): Vector[U, S[A]] = appended(x)
   def appended[U >: T](x: U): Vector[U, S[A]]
+
+  //TODO: Remove me
+  def toSPA(): Vector[T, S[P[A]]]
 end Vector
 
 object Vector:
-  def fix[T, A <: Arity](v: Vector[T, S[P[A]]]): Vector[T, A] =  v.asInstanceOf[Vector[T, A]]
 
   def apply[T](): Vector[T, 0] = VNil
   def apply[T](e0: T): Vector[T, 1] = e0 +: Vector()
@@ -60,7 +62,7 @@ object Vector:
       val tMin1: P[A] = minusOne(times)
       val init = filled[T,P[A]](tMin1)(f)
       //if not times-1, will result in vect(0) != f(0)
-      fix(init :+ f(tMin1))
+      (init :+ f(tMin1)).toA()
 
 
 
@@ -82,6 +84,8 @@ case object VNil extends Vector[Nothing, 0]:
   def zipWithIndex_(offset: Int) = VNil
   def appended[U](x: U) = x +: VNil
 
+  def toSPA() = throw new IllegalArgumentException(f"Attempt to cast unfix on VNil, this would allow to create a Vector[T,P[0]]!")
+
 
 final case class +:[+T, A <: Arity](h: T, t: Vector[T,A]) extends Vector[T, S[A]]:
   def apply[At <: Arity](index: At): T = 
@@ -98,7 +102,7 @@ final case class +:[+T, A <: Arity](h: T, t: Vector[T,A]) extends Vector[T, S[A]
   def init =
     t match
       case VNil => t
-      case _ => val res = h +: t.init; Vector.fix(res)
+      case _ => val res = h +: t.init; res.toA()
   
   def last = 
     t match
@@ -122,5 +126,10 @@ final case class +:[+T, A <: Arity](h: T, t: Vector[T,A]) extends Vector[T, S[A]
   def zip[U](other: Vector[U, S[A]]) = (h, other.head) +: t.zip(other.tail)
   def zipWithIndex_(offset: Int) = (h, offset) +: t.zipWithIndex_(offset + 1)
   def appended[U >: T](x: U): Vector[U, S[S[A]]] = h +: t.appended(x)
+
+  def toSPA() = this
   
 end +:
+
+extension[T, A <: Arity] (v: Vector[T, S[P[A]]]):
+  def toA(): Vector[T, A] = v.asInstanceOf[Vector[T, A]]
