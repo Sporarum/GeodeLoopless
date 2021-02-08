@@ -37,9 +37,9 @@ object Main {
     //val test = vec(4)
     //println(subDotOne.prettyDebug(Nat(10) +: VNil))
     val vec1 = Nat(3) +: VNil
-    val vec2 = Vector(Nat(0), Nat(0))
-    val fun = areEqual
-    println( (∅[1]ᶜ) contains vec1)
+    val vec2 = Vector(Nat(0), Nat(6))
+    val fun = fold(Const(0),max,Proj[1](0))(using 1:1)
+    println( fun.prettyDebug(vec1))
   }
 
 }

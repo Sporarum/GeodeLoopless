@@ -62,26 +62,13 @@ def fold[A <: Arity](z: PrimRecFun[P[A]], combine: PrimRecFun[2], leaf: PrimRecF
     def inc(i: Arity): PrimRecFun[A] = if i == a-1 then Succ(Proj[A](i)) else Proj(i)
     Comp(exclusiveFold(z, combine, leaf), Vector.filled[PrimRecFun[A], A](a)(inc))
 
+//X :+ y -> sum from t=0 to t<y of f(X :+ t)
 def sum[A <: Arity](f: PrimRecFun[A])(using a: A): PrimRecFun[A] =
-    def case0 = Const[P[A]](0)
-    // X :+ t :+ acc -> f(X :+ t)
-    def fTweaked: PrimRecFun[S[A]] = Comp(f, Vector.filled[PrimRecFun[S[A]], A](a)(i => Proj(i))) //TODO: replace when variable substitution added
-    // X :+ t :+ acc -> f(X :+ t) + acc
-    def caseSn: PrimRecFun[S[A]] = fTweaked + Proj(a)
-    // sum(X :+ 0) -> 0
-    // sum(X :+ S(t)) -> f(X :+ t) + sum(X :+ t)
-    Rec(case0, caseSn)
+    fold(z = Const[P[A]](0), combine = add, leaf = f)
 
-//X :+ y -> product from t=0 to t=y of f(X :+ t)
+//X :+ y -> product from t=0 to t<y of f(X :+ t)
 def product[A <: Arity](f: PrimRecFun[A])(using a: A): PrimRecFun[A] =
-    def case0 = Const[P[A]](0)
-    // X :+ t :+ acc -> f(X :+ t)
-    def fTweaked: PrimRecFun[S[A]] = Comp(f, Vector.filled[PrimRecFun[S[A]], A](a)(i => Proj(i))) //TODO: replace when variable substitution added
-    // X :+ t :+ acc -> f(X :+ t) + acc
-    def caseSn: PrimRecFun[S[A]] = fTweaked * Proj(a)
-    // sum(X :+ 0) -> 0
-    // sum(X :+ S(t)) -> f(X :+ t) * sum(X :+ t)
-    Rec(case0, caseSn)
+    fold(z = Const[P[A]](1), combine = mult, leaf = f)
 
 //f(z *: X) = 0 if for all t <= z: (t *: X) not in A
 def boundedMin[A <: Arity](set: PrimRecSet[A]): PrimRecFun[A] = ???
