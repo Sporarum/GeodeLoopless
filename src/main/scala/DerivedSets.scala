@@ -33,6 +33,12 @@ def nDsFrom1Ds[A <: Arity](oneDs: Vector[PrimRecSet[1], A]): PrimRecSet[A] =
 
 def nDSingleton[A <: Arity](nats: Vector[Nat, A]): PrimRecSet[A] = nDsFrom1Ds(nats.map(singleton(_)))
 
+def boundedExists[A <: Arity](set: PrimRecSet[A])(using a: A): PrimRecSet[A] =
+    PrimRecSet(sign on sum(set.chi))
+
+def boundedForAll[A <: Arity](set: PrimRecSet[A])(using a: A): PrimRecSet[A] =
+    PrimRecSet(product(set.chi))
+
 extension[A <: Arity] (s0: PrimRecSet[A]):
     inline def ∪(s1: PrimRecSet[A]) = union(s0,s1)
     inline def ∩(s1: PrimRecSet[A]) = intersection(s0,s1)
