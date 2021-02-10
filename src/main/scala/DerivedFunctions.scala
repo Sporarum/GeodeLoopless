@@ -34,7 +34,8 @@ def caseStudy[A <: Arity, NumSets <: Arity](functions: Vector[PrimRecFun[A], S[N
     val cases = (sets :+ full[A]).zip(restrictors).map{case (set, restrictor) => set ∩ restrictor}
 
     //x in s0 -> f0(x), x in s1 \ s0 -> f1(s), ...
-    functions.zip(cases).map{case (f, c) => f * c.chi}.fold(Const(0)){case (acc, f) => acc + f}
+    val res: PrimRecFun[A] = functions.zip(cases).map{case (f, c) => f * c.chi}.fold(Const(0)){case (acc, f) => acc + f}
+    UserDefined(s"caseStudy($functions, $sets)", res)
 
 def min: PrimRecFun[2] = UserDefined("min", 
     caseStudy(
@@ -47,28 +48,30 @@ def max: PrimRecFun[2] = UserDefined("max",
         smallerSet +: VNil
     ))
 //X :+ y -> combination from t=0 to t<y of leaf(X :+ t), with z as zero element => combine(leaf(X :+ (y-1)), ... combine(leaf(X :+ 1), combine(leaf(X :+ 0), z))...)
-def exclusiveFold[A <: Arity](z: PrimRecFun[P[A]], combine: PrimRecFun[2], leaf: PrimRecFun[A])(using a: A): PrimRecFun[A] =
+def exclusiveFold[A <: Arity](zero: PrimRecFun[P[A]], combine: PrimRecFun[2], leaf: PrimRecFun[A])(using a: A): PrimRecFun[A] =
     // X :+ t :+ acc -> leaf(X :+ t)
     def leafTweaked: PrimRecFun[S[A]] = Comp(leaf, Vector.filled[PrimRecFun[S[A]], A](a)(i => Proj(i))) //TODO: replace when variable substitution added
     // X :+ t :+ acc -> combine(leaf(X :+ t), acc)
     def caseSn: PrimRecFun[S[A]] = combine(leafTweaked, Proj(a))
     // fold(X :+ 0) -> z(X)
     // fold(X :+ S(t)) -> combine(leaf(X :+ t), fold(X :+ t))
-    Rec(z, caseSn)
+    val res: PrimRecFun[A] = Rec(zero, caseSn)
+    UserDefined(s"exclusiveFold($zero, $combine, $leaf)", res)
 
-//X :+ y -> combination from t=0 to t=y of leaf(X :+ t), with z as zero element => combine(leaf(X :+ y), ... combine(leaf(X :+ 1), combine(leaf(X :+ 0), z))...)
-def fold[A <: Arity](z: PrimRecFun[P[A]], combine: PrimRecFun[2], leaf: PrimRecFun[A])(using a: A): PrimRecFun[A] =
+//X :+ y -> combination from t=0 to t=y of leaf(X :+ t), with zero as zero element => combine(leaf(X :+ y), ... combine(leaf(X :+ 1), combine(leaf(X :+ 0), zero))...)
+def fold[A <: Arity](zero: PrimRecFun[P[A]], combine: PrimRecFun[2], leaf: PrimRecFun[A])(using a: A): PrimRecFun[A] =
     //increments y by 1
     def inc(i: Arity): PrimRecFun[A] = if i == a-1 then Succ(Proj[A](i)) else Proj(i)
-    Comp(exclusiveFold(z, combine, leaf), Vector.filled[PrimRecFun[A], A](a)(inc))
+    val res: PrimRecFun[A] = Comp(exclusiveFold(zero, combine, leaf), Vector.filled[PrimRecFun[A], A](a)(inc))
+    UserDefined(s"fold($zero, $combine, $leaf)", res)
 
 //X :+ y -> sum from t=0 to t<y of f(X :+ t)
 def sum[A <: Arity](f: PrimRecFun[A])(using a: A): PrimRecFun[A] =
-    fold(z = Const[P[A]](0), combine = add, leaf = f)
+    fold(zero = Const[P[A]](0), combine = add, leaf = f)
 
 //X :+ y -> product from t=0 to t<y of f(X :+ t)
 def product[A <: Arity](f: PrimRecFun[A])(using a: A): PrimRecFun[A] =
-    fold(z = Const[P[A]](1), combine = mult, leaf = f)
+    fold(zero = Const[P[A]](1), combine = mult, leaf = f)
 
 //f(z *: X) = 0 if for all t <= z: (t *: X) not in A
 def boundedMin[A <: Arity](set: PrimRecSet[A]): PrimRecFun[A] = ???
