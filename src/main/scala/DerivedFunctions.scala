@@ -41,7 +41,7 @@ def min: PrimRecFun[2] = UserDefined("min",
         Proj[2](0) +: Proj[2](1) +: VNil, 
         smallerSet +: VNil
     ))
-def max: PrimRecFun[2] = UserDefined("min", 
+def max: PrimRecFun[2] = UserDefined("max", 
     caseStudy(
         Proj[2](1) +: Proj[2](0) +: VNil, 
         smallerSet +: VNil
