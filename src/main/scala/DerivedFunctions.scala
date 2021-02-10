@@ -73,8 +73,14 @@ def sum[A <: Arity](f: PrimRecFun[A])(using a: A): PrimRecFun[A] =
 def product[A <: Arity](f: PrimRecFun[A])(using a: A): PrimRecFun[A] =
     fold(zero = Const[P[A]](1), combine = mult, leaf = f)
 
-//f(z *: X) = 0 if for all t <= z: (t *: X) not in A
-def boundedMin[A <: Arity](set: PrimRecSet[A]): PrimRecFun[A] = ???
+def minNotZero: PrimRecFun[2] = 
+    val m = Proj[2](0)
+    val n = Proj[2](1)
+    val res = caseStudy(
+        m                   +: n                    +: min +: VNil,
+        (n ?= Const[2](0))  +: (m ?= Const[2](0))   +: VNil
+    )
+    UserDefined("minNotZero", res)
 
 
 
