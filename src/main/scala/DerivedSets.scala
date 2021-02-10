@@ -1,4 +1,5 @@
 import scala.language.implicitConversions
+import scala.language.postfixOps
 
 def chi_∅[A <: Arity]: PrimRecFun[A] = Const(0)
 def empty[A <: Arity] = PrimRecSet(chi_∅[A])
@@ -37,3 +38,10 @@ extension[A <: Arity] (s0: PrimRecSet[A]):
     inline def ∩(s1: PrimRecSet[A]) = intersection(s0,s1)
     inline def ᶜ: PrimRecSet[A] = complement(s0)
 
+extension[A <: Arity] (f0: PrimRecFun[A]):
+    inline def <(f1: PrimRecFun[A]) = PrimRecSet(smaller on (f0, f1))
+    inline def >(f1: PrimRecFun[A]) = PrimRecSet(smaller on (f1, f0))
+    inline def <=(f1: PrimRecFun[A]) = ((f0 > f1)ᶜ)
+    inline def >=(f1: PrimRecFun[A]) = ((f0 < f1)ᶜ)
+    inline def ?=(f1: PrimRecFun[A]) = PrimRecSet(areEqual on (f0, f1))
+    inline def !=(f1: PrimRecFun[A]) = (f0 ?= f1)ᶜ
