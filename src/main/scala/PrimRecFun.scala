@@ -5,7 +5,9 @@ sealed trait PrimRecFun[A <: Arity]:
   def apply(args: V): Nat
   def debug(args: V): (Nat, String) = 
     this match
-      case UserDefined(_, f) => f.debug_(args) //If we are debugging a user defined function, debug the inside
+      case UserDefined(name, f) => 
+        val (nat, string) = f.debug_(args) //If we are debugging a user defined function, debug the inside
+        (nat, s"Debugging $name:\n$string")
       case _ => this.debug_(args)
     
   def debug_(args: V): (Nat, String)
