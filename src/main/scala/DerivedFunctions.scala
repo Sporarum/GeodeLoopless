@@ -4,9 +4,9 @@ import scala.language.postfixOps
 
 def identity[A <: Arity](n: A): PrimRecFun[A] = ???
 
-def subDotOne: PrimRecFun[1] = UserDefined("subDotOne", Rec(Const(0),Proj(0)))
+def pred: PrimRecFun[1] = UserDefined("pred", Rec(Const(0),Proj(0)))
 
-def subDot: PrimRecFun[2] = UserDefined("subDot", Rec(Proj(0), subDotOne on Proj(2)))
+def subDot: PrimRecFun[2] = UserDefined("subDot", Rec(Proj(0), pred on Proj(2)))
 
 def add: PrimRecFun[2] = UserDefined("add", Rec(Proj(0), Succ on Proj(2)))
 
