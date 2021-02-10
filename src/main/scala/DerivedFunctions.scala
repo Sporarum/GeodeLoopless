@@ -82,7 +82,16 @@ def minNotZero: PrimRecFun[2] =
     )
     UserDefined("minNotZero", res)
 
+//f(X :+ z) = 0 if for all t <= z: (X :+ t) not in A
+//f(X :+ z) = S(t) for minimal t <= z s.t. (X :+ t) in A
+def boundedMinPlusOne[A <: Arity](set: PrimRecSet[A])(using a: A): PrimRecFun[A] =
+    val t: PrimRecFun[A] = Proj(minusOne(a))
+    val checkAndReturn: PrimRecFun[A] = Succ(t) * set.chi
+    fold(zero = Const(0), combine = minNotZero, leaf = checkAndReturn)
 
+//f(X :+ z) = 0 if for all t <= z: (X :+ t) not in A
+//f(X :+ z) = t for minimal t <= z s.t. (X :+ t) in A
+def boundedMin[A <: Arity](set: PrimRecSet[A])(using a: A): PrimRecFun[A] = pred on boundedMinPlusOne(set)
 
 
 extension[A <: Arity] (f0: PrimRecFun[A]):
