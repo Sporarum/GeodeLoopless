@@ -4,6 +4,7 @@ import scala.compiletime.testing.{Error => TypeError}
 import scala.compiletime.testing.typeCheckErrors
 import scala.annotation.implicitNotFound
 import scala.language.experimental.dependent
+//import scala.util.Not
 
 
 type Arity = Int //& Singleton
@@ -27,6 +28,17 @@ type <=[A1 <: Arity, A2 <: Arity] = A1 match
 
 
 def minusOne[A <: Arity](x: A): P[A] = (x-1).asInstanceOf[P[A]]
+
+def plusOne[A <: Arity](a: A): S[A] = (a+1).asInstanceOf[S[A]]
+
+//given [A <: Arity & Singleton](using Not[A]) as A = valueOf[A]
+
+type Zero = 0
+given Zero = 0
+type Three = 3
+given Three = 3
+given [A <: Arity](using a: A) as S[A] = plusOne(a) //only goes up to 5 (3+2), add given of 6 to go up to 8 (6+2)
+
 
 /*
 type Arity[Int]
