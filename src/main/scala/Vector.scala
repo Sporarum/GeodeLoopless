@@ -16,10 +16,10 @@ trait Vector[+T, A <: Arity]:
   def map[U](f: T => U): Vector[U, A]
 
   //TODO: All of those should be able to throw type errors if VNil
-  def head: T
-  def tail: Vector[T, P[A]]
-  def init: Vector[T, P[A]]
-  def last: T
+  def head_ : T
+  def tail_ : Vector[T, P[A]]
+  def init_ : Vector[T, P[A]]
+  def last_ : T
 
   def reverse: Vector[T, A]
   def fold[U >: T](z: U)(op: (U,U) => U): U = foldLeft(z)(op)
@@ -69,10 +69,10 @@ object Vector:
 case object VNil extends Vector[Nothing, 0]:
   def apply[At <: Arity](index: At) = throw new IllegalArgumentException(f"Acces on index ${index} of an empty Vector (This means your index was ${index+1} bigger than the size of your Vector)")
   def map[U](f: Nothing => U) = VNil
-  def head = throw new IllegalArgumentException(f"Empty Vector has no head")
-  def tail = throw new IllegalArgumentException(f"Empty Vector has no tail")
-  def init = throw new IllegalArgumentException(f"Empty Vector has no init")
-  def last = throw new IllegalArgumentException(f"Empty Vector has no last")
+  def head_ = throw new IllegalArgumentException(f"Empty Vector has no head")
+  def tail_ = throw new IllegalArgumentException(f"Empty Vector has no tail")
+  def init_ = throw new IllegalArgumentException(f"Empty Vector has no init")
+  def last_ = throw new IllegalArgumentException(f"Empty Vector has no last")
   def reverse = VNil
   def scanLeft[U](z: U)(op: (U, Nothing) => U) = z +: VNil
   def foldLeft[U](z: U)(op: (U, Nothing) => U) = z
@@ -96,18 +96,18 @@ final case class +:[+T, A <: Arity](h: T, t: Vector[T,A]) extends Vector[T, S[A]
       t.apply(nIndex)
 
   def map[U](f: T => U) = f(h) +: t.map(f)
-  def head = h
-  def tail = t
+  def head_ = h
+  def tail_ = t
 
-  def init =
+  def init_ =
     t match
       case VNil => t
-      case _ => val res = h +: t.init; res.toA()
+      case _ => val res = h +: t.init_; res.toA()
   
-  def last = 
+  def last_ = 
     t match
       case VNil => h
-      case _ => t.last
+      case _ => t.last_
   def reverse = t.reverse :+ h
 
   def foldLeft[U](z: U)(op: (U, T) => U) = t.foldLeft(op(z,h))(op)
@@ -133,3 +133,9 @@ end +:
 
 extension[T, A <: Arity] (v: Vector[T, S[P[A]]]):
   def toA(): Vector[T, A] = v.asInstanceOf[Vector[T, A]]
+
+extension[T, A <: Arity] (v: Vector[T, S[A]]):
+  def head = v.head_
+  def tail = v.tail_
+  def init = v.init_
+  def last = v.last_
