@@ -12,7 +12,7 @@ trait Vector[+T, A <: Arity]:
     //case _ => error("")
   }*/
   //type Geq[At] = A <= At
-  def apply[At <: Arity](index: At): T
+  def apply[At <: Arity](index: At)(using At < A): T
   def map[U](f: T => U): Vector[U, A]
 
   //TODO: All of those should be able to throw type errors if VNil
@@ -67,7 +67,7 @@ object Vector:
 
 
 case object VNil extends Vector[Nothing, 0]:
-  def apply[At <: Arity](index: At) = throw new IllegalArgumentException(f"Acces on index ${index} of an empty Vector (This means your index was ${index+1} bigger than the size of your Vector)")
+  def apply[At <: Arity](index: At)(using At < 0) = throw new IllegalArgumentException(f"Acces on index ${index} of an empty Vector (This means your index was ${index+1} bigger than the size of your Vector)")
   def map[U](f: Nothing => U) = VNil
   def head_ = throw new IllegalArgumentException(f"Empty Vector has no head")
   def tail_ = throw new IllegalArgumentException(f"Empty Vector has no tail")
@@ -88,12 +88,12 @@ case object VNil extends Vector[Nothing, 0]:
 
 
 final case class +:[+T, A <: Arity](h: T, t: Vector[T,A]) extends Vector[T, S[A]]:
-  def apply[At <: Arity](index: At): T = 
+  def apply[At <: Arity](index: At)(using cond: At < S[A]): T = 
     if index == 0
     then h
     else
       val nIndex: P[At] = minusOne(index)
-      t.apply(nIndex)
+      t.apply(nIndex)(using cond.asInstanceOf[P[At] < A])
 
   def map[U](f: T => U) = f(h) +: t.map(f)
   def head_ = h

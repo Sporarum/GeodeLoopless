@@ -33,7 +33,7 @@ sealed case class Const[A <: Arity](val constant: Nat) extends PrimRecFun[A]:
 
 
 //f(X) = x_n
-sealed case class Proj[A <: Arity](val n: Arity) extends PrimRecFun[A]:
+sealed case class Proj[A <: Arity, At <: Arity]()(using n: At)(using At < A) extends PrimRecFun[A]:
   def apply(args: V) = args(n)
   def debug_(args: V) =
     (apply(args), s"Proj($n) on args: $args")
@@ -41,7 +41,7 @@ sealed case class Proj[A <: Arity](val n: Arity) extends PrimRecFun[A]:
 
 //f(x) = Succ(x)
 case object Succ extends PrimRecFun[1]:
-  def apply(args: V) = SuccNat(args(0))
+  def apply(args: V) = SuccNat(args.head)
   def debug_(args: V) =
     (apply(args), s"Succ on args: $args") 
 

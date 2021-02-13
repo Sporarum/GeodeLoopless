@@ -26,6 +26,16 @@ type <=[A1 <: Arity, A2 <: Arity] = A1 match
     case 0 => false
   case 0 => true
 
+type <[A1 <: Arity, A2 <: Arity] = A1 match
+  case S[a1] => A2 match
+    case S[a2] => a1 < a2
+    case 0 => false
+  case 0 => A2 match
+    case S[a2] => true
+    case 0 => false
+
+type True = true
+given True = true
 
 def minusOne[A <: Arity](x: A): P[A] = (x-1).asInstanceOf[P[A]]
 
