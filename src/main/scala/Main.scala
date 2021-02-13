@@ -33,7 +33,7 @@ object Main {
     //val test = vec(4)
     //println(subDotOne.prettyDebug(Nat(10) +: VNil))
     val vec2 = Vector(Nat(6), Nat(6))
-    println(add.prettyDebug(vec2))
+    //println(add.prettyDebug(vec2))
   }
 
 }
