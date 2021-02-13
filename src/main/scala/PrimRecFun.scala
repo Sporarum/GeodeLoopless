@@ -56,7 +56,7 @@ sealed case class Comp[A1 <: Arity, A2 <: Arity](g: PrimRecFun[A1], fs: Vector[P
     val (resultG, stringG) = g.debug_(resultsFs)
     (resultG, s"Comp on args: $args {\n$stringFs\ng: {\n$stringG\n}: $resultG\n}: $resultG")
 
-// f(X :+ 0) = init(X) with X a vector of arity A
+// f(X :+ 0) = init(X) with X a vector of arity A-1
 // f(X :+ S(n)) = step(X :+ n :+ f(X :+ n))
 sealed case class Rec[A <: Arity](base: PrimRecFun[P[A]], step: PrimRecFun[S[A]]) extends PrimRecFun[A]:
   def apply(args: V) = 
