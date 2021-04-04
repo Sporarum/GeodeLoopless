@@ -3,7 +3,7 @@ import scala.compiletime.S
 import scala.compiletime.testing.{Error => TypeError}
 import scala.compiletime.testing.typeCheckErrors
 import scala.annotation.implicitNotFound
-import scala.language.experimental.dependent
+//import scala.language.experimental.dependent
 //import scala.util.Not
 
 
@@ -36,8 +36,8 @@ def plusOne[A <: Arity](a: A): S[A] = (a+1).asInstanceOf[S[A]]
 type Zero = 0
 given Zero = 0
 type Three = 3
-given Three = 3
-given [A <: Arity](using a: A) as S[A] = plusOne(a) //only goes up to 5 (3+2), add given of 6 to go up to 8 (6+2)
+//given Three = 3
+given [A <: Arity](using a: A): S[A] = plusOne(a) //only goes up to 5 (3+2), add given of 6 to go up to 8 (6+2)
 
 
 /*
