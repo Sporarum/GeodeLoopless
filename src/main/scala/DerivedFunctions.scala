@@ -94,7 +94,7 @@ def boundedMinPlusOne[A <: Arity](set: PrimRecSet[A])(using a: A): PrimRecFun[A]
 def boundedMin[A <: Arity](set: PrimRecSet[A])(using a: A): PrimRecFun[A] = pred on boundedMinPlusOne(set)
 
 
-extension[A <: Arity] (f0: PrimRecFun[A]):
+extension[A <: Arity] (f0: PrimRecFun[A])
     inline def +(f1: PrimRecFun[A]) = add on (f0, f1)
     inline def ∸(f1: PrimRecFun[A]) = subDot on (f0, f1)
     inline def *(f1: PrimRecFun[A]) = mult on (f0, f1)

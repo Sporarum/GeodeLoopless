@@ -131,10 +131,10 @@ final case class +:[+T, A <: Arity](h: T, t: Vector[T,A]) extends Vector[T, S[A]
   
 end +:
 
-extension[T, A <: Arity] (v: Vector[T, S[P[A]]]):
+extension[T, A <: Arity] (v: Vector[T, S[P[A]]])
   def toA(): Vector[T, A] = v.asInstanceOf[Vector[T, A]]
 
-extension[T, A <: Arity] (v: Vector[T, S[A]]):
+extension[T, A <: Arity] (v: Vector[T, S[A]])
   def head = v.head_
   def tail = v.tail_
   def init = v.init_

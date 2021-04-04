@@ -46,8 +46,8 @@ case object Succ extends PrimRecFun[1]:
     (apply(args), s"Succ on args: $args") 
 
 
-//f(X) = g(f_1(X), f_2(X), ... , f_A1(X)) with X a vector of arity A2
-sealed case class Comp[A1 <: Arity, A2 <: Arity](g: PrimRecFun[A1], fs: Vector[PrimRecFun[A2], A1]) extends PrimRecFun[A2]:
+//f(X) = g(f_1(X), f_2(X), ... , f_ArityG(X)) with X a vector of arity ArityFs
+sealed case class Comp[ArityG <: Arity, ArityFs <: Arity](g: PrimRecFun[ArityG], fs: Vector[PrimRecFun[ArityFs], ArityG]) extends PrimRecFun[ArityFs]:
   def apply(args: V) = g(fs.map(_(args)))
   def debug_(args: V) =
     val (resultsFs, strings) = fs.map(_.debug_(args)).unzip

@@ -49,13 +49,13 @@ def cartesianProduct[A0 <: Arity, A1 <: Arity](s0: PrimRecSet[A0], s1: PrimRecSe
     
     ns0 ∩ ns1
 
-extension[A <: Arity, B <: Arity] (s0: PrimRecSet[A]):
+extension[A <: Arity, B <: Arity] (s0: PrimRecSet[A])
     inline def ∪(s1: PrimRecSet[A]) = union(s0,s1)
     inline def ∩(s1: PrimRecSet[A]) = intersection(s0,s1)
     inline def ᶜ: PrimRecSet[A] = complement(s0)
     inline def x(s1: PrimRecSet[B])(using A, B): PrimRecSet[A + B] = cartesianProduct(s0, s1)
 
-extension[A <: Arity] (f0: PrimRecFun[A]):
+extension[A <: Arity] (f0: PrimRecFun[A])
     inline def <(f1: PrimRecFun[A]) = PrimRecSet(smaller on (f0, f1))
     inline def >(f1: PrimRecFun[A]) = PrimRecSet(smaller on (f1, f0))
     inline def <=(f1: PrimRecFun[A]) = ((f0 > f1)ᶜ)
@@ -63,5 +63,5 @@ extension[A <: Arity] (f0: PrimRecFun[A]):
     inline def ?=(f1: PrimRecFun[A]) = PrimRecSet(areEqual on (f0, f1))
     inline def !=(f1: PrimRecFun[A]) = ((f0 ?= f1)ᶜ)
 
-extension[A <: Arity, OtherA <: Arity](v0: Vector[PrimRecFun[OtherA], A]):
+extension[A <: Arity, OtherA <: Arity](v0: Vector[PrimRecFun[OtherA], A])
     inline def in(s0: PrimRecSet[A]): PrimRecSet[OtherA] = PrimRecSet(Comp(s0.chi, v0))
