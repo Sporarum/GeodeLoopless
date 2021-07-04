@@ -2,9 +2,9 @@
 object Main {
 
   def main(args: Array[String]): Unit = {
-    val proj = Proj[2](0) //val proj = Proj[0](0) Should fail at compile time
+    val proj = Proj[2](0)
     val succ: PrimRecFun[1] = Succ
-    val t: P[0] = minusOne(0) //Should fail, but at least is not -1 and S[P[0]] /= 0
+    val t: P[0] = minusOne(0) //Only fails at compile time
     val vec = Nat(4) +: Nat(3) +: VNil
     val vecNumber: Vector[Double | Int, 2] = 1.0 +: 1 +: VNil
     val vecNum2 = vecNumber.map{ _ match {

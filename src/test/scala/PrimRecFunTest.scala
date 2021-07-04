@@ -31,7 +31,7 @@ class PrimRecFunTest {
     val rand2 = Nat(Random.nextInt(100))
     val v = rand0 +: rand1 +: rand2 +: VNil
 
-    assertEquals(rand0, Proj(0)(v))
+    assertEquals(rand0, Proj[3](0)(v))
   }
 
   @Test def `Proj(1) returns 2st element`(): Unit = {
@@ -40,7 +40,7 @@ class PrimRecFunTest {
     val rand2 = Nat(Random.nextInt(100))
     val v = rand0 +: rand1 +: rand2 +: VNil
 
-    assertEquals(rand1, Proj(1)(v))
+    assertEquals(rand1, Proj[3](1)(v))
   }
 
   @Test def `Proj(2) returns 3st element`(): Unit = {
@@ -49,7 +49,7 @@ class PrimRecFunTest {
     val rand2 = Nat(Random.nextInt(100))
     val v = rand0 +: rand1 +: rand2 +: VNil
 
-    assertEquals(rand2, Proj(2)(v))
+    assertEquals(rand2, Proj[3](2)(v))
   }
 
   @Test def `Succ(rand) returns rand + 1`(): Unit = {

@@ -1,4 +1,5 @@
 import scala.compiletime.S
+import scala.compiletime.ops.int.{<}
 
 sealed trait PrimRecFun[A <: Arity]:
   type V = Vector[Nat, A]
@@ -32,8 +33,16 @@ sealed case class Const[A <: Arity](val constant: Nat) extends PrimRecFun[A]:
     (apply(args), s"Const($constant) on args: $args") //print arity ?
 
 
+// http://caryrobbins.com/dev/scala-type-curry/
+private final class _ProjUtil[A <: Arity] {
+  def apply[At <: Arity & Singleton](n: At )(using At < A): PrimRecFun[A] = _Proj(n)
+}
+
+// Wrapper for _Proj to allow type currying: Proj[A][At] = _Proj[A, At]
+def Proj[A <: Arity] = _ProjUtil[A]()
+
 //f(X) = x_n
-sealed case class Proj[A <: Arity](val n: Arity) extends PrimRecFun[A]:
+sealed case class _Proj[A <: Arity, At <: Arity](val n: At)(using At < A) extends PrimRecFun[A]:
   def apply(args: V) = args(n)
   def debug_(args: V) =
     (apply(args), s"Proj($n) on args: $args")
@@ -41,9 +50,9 @@ sealed case class Proj[A <: Arity](val n: Arity) extends PrimRecFun[A]:
 
 //f(x) = Succ(x)
 case object Succ extends PrimRecFun[1]:
-  def apply(args: V) = SuccNat(args(0))
+  def apply(args: V) = SuccNat(args[0](0))
   def debug_(args: V) =
-    (apply(args), s"Succ on args: $args") 
+    (apply(args), s"Succ on args: $args")
 
 
 //f(X) = g(f_1(X), f_2(X), ... , f_ArityG(X)) with X a vector of arity ArityFs
@@ -56,6 +65,7 @@ sealed case class Comp[ArityG <: Arity, ArityFs <: Arity](g: PrimRecFun[ArityG],
     val (resultG, stringG) = g.debug_(resultsFs)
     (resultG, s"Comp on args: $args {\n$stringFs\ng: {\n$stringG\n}: $resultG\n}: $resultG")
 
+    
 // f(X :+ 0) = init(X) with X a vector of arity A-1
 // f(X :+ S(n)) = step(X :+ n :+ f(X :+ n))
 sealed case class Rec[A <: Arity](base: PrimRecFun[P[A]], step: PrimRecFun[S[A]]) extends PrimRecFun[A]:
