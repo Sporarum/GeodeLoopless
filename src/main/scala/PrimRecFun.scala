@@ -2,6 +2,9 @@ import scala.compiletime.S
 
 sealed trait PrimRecFun[A <: Arity]:
   type V = Vector[Nat, A]
+  
+  val arity: A = valueOf[A]
+
   def apply(args: V): Nat
   def debug(args: V): (Nat, String) = 
     this match

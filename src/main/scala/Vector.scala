@@ -6,6 +6,9 @@ import scala.annotation.implicitNotFound
 import scala.quoted._
 
 trait Vector[+T, A <: Arity]:
+
+  val length: A = valueOf[A]
+
   /*@implicitNotFound("index out of bounds")
   type Check[At <: Arity] <: T = A <= At match {
     case true => T
