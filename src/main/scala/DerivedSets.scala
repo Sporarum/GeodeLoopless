@@ -17,7 +17,7 @@ def areEqual: PrimRecFun[2] = UserDefined("areEqual", not on diff )
 def areEqualSet = PrimRecSet(areEqual)
 
 def chi_singleton(n: Nat): PrimRecFun[1] = areEqual(Proj(0), Const(n))
-def singleton(n: Nat) = PrimRecSet(chi_singleton(n))
+def singleton(n: Nat): PrimRecSet[1] = PrimRecSet(chi_singleton(n))
 
 def union[A <: Arity](s0: PrimRecSet[A], s1: PrimRecSet[A]): PrimRecSet[A] = PrimRecSet(sign(s0.chi + s1.chi))
 
