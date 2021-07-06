@@ -27,7 +27,7 @@ type <=[A1 <: Arity, A2 <: Arity] = A1 match
   case 0 => true
 
 
-def minusOne[A <: Arity](x: A): P[A] = (x-1).asInstanceOf[P[A]]
+def minusOne[A <: Arity](x: A): P[A] = if x != 0 then (x-1).asInstanceOf[P[A]] else throw new IllegalArgumentException("Cannot remove 1 from 0 (Arities cannot be negative)")
 
 def plusOne[A <: Arity](a: A): S[A] = (a+1).asInstanceOf[S[A]]
 

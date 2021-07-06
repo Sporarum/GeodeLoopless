@@ -6,6 +6,9 @@ import scala.annotation.implicitNotFound
 import scala.quoted._
 
 trait Vector[+T, A <: Arity]:
+
+  val length: A = valueOf[A]
+
   /*@implicitNotFound("index out of bounds")
   type Check[At <: Arity] <: T = A <= At match {
     case true => T
@@ -84,7 +87,7 @@ case object VNil extends Vector[Nothing, 0]:
   def zipWithIndex_(offset: Int) = VNil
   def appended[U](x: U) = x +: VNil
 
-  def toSPA() = throw new IllegalArgumentException(f"Attempt to cast unfix on VNil, this would allow to create a Vector[T,P[0]]!")
+  def toSPA() = throw new IllegalArgumentException(f"Attempt to cast toSPA on VNil, this would allow to create a Vector[T,P[0]]!")
 
 
 final case class +:[+T, A <: Arity](h: T, t: Vector[T,A]) extends Vector[T, S[A]]:
