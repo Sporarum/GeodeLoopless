@@ -107,3 +107,6 @@ extension [A0 <: Arity] (g: PrimRecFun[3])
     g.on(f0,f1,f2)
   def on(f0: PrimRecFun[A0], f1: PrimRecFun[A0], f2: PrimRecFun[A0]) =
     Comp[3, A0](g, f0 +: f1 +: f2 +: VNil)
+
+given conversion_nat_to_const[A <: Arity]: Conversion[Nat, Const[A]] = Const[A](_)
+given conversion_int_to_const[A <: Arity]: Conversion[Int, Const[A]] = int => conversion_nat_to_const(Nat(int))
