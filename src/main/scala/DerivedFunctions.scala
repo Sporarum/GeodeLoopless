@@ -4,19 +4,19 @@ import scala.language.postfixOps
 
 def identity[A <: Arity](n: A): PrimRecFun[A] = ???
 
-def pred: PrimRecFun[1] = UserDefined("pred", Rec(Const(0),Proj(0)))
+def pred: PrimRecFun[1] = UserDefined("pred", Rec(0, Proj(0)))
 
 def subDot: PrimRecFun[2] = UserDefined("subDot", Rec(Proj(0), pred on Proj(2)))
 
 def add: PrimRecFun[2] = UserDefined("add", Rec(Proj(0), Succ on Proj(2)))
 
-def mult: PrimRecFun[2] = UserDefined("mult", Rec(Const(0), Proj(2) + Proj(0)))
+def mult: PrimRecFun[2] = UserDefined("mult", Rec(0, Proj(2) + Proj(0)))
 
-def exp(base: Nat): PrimRecFun[1] = UserDefined("exp", Rec(Const(0), Proj(1) * Const(base)))
+def exp(base: Nat): PrimRecFun[1] = UserDefined("exp", Rec(0, Proj(1) * base))
 
-def fact: PrimRecFun[1] = UserDefined("fact", Rec(Const(1), Proj(1) * Succ.on(Proj(0))))
+def fact: PrimRecFun[1] = UserDefined("fact", Rec(1, Proj(1) * Succ.on(Proj(0))))
 
-def not: PrimRecFun[1] = UserDefined("not", Const(1) ∸ Proj(0))
+def not: PrimRecFun[1] = UserDefined("not", 1 ∸ Proj(0))
 
 def sign: PrimRecFun[1] = UserDefined("sign", not on not on Proj(0))
 
@@ -78,7 +78,7 @@ def minNotZero: PrimRecFun[2] =
     val n = Proj[2](1)
     val res = caseStudy(
         m                   +: n                    +: min +: VNil,
-        (n ?= Const[2](0))  +: (m ?= Const[2](0))   +: VNil
+        (n ?= 0)  +: (m ?= 0)   +: VNil
     )
     UserDefined("minNotZero", res)
 
@@ -87,7 +87,7 @@ def minNotZero: PrimRecFun[2] =
 def boundedMinPlusOne[A <: Arity](set: PrimRecSet[A])(using a: A): PrimRecFun[A] =
     val t: PrimRecFun[A] = Proj(minusOne(a))
     val checkAndReturn: PrimRecFun[A] = Succ(t) * set.chi
-    fold(zero = Const(0), combine = minNotZero, leaf = checkAndReturn)
+    fold(zero = 0, combine = minNotZero, leaf = checkAndReturn)
 
 //f(X :+ z) = 0 if for all t <= z: (X :+ t) not in A
 //f(X :+ z) = t for minimal t <= z s.t. (X :+ t) in A
