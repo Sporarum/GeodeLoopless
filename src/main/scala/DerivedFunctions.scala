@@ -77,7 +77,7 @@ def minNotZero: PrimRecFun[2] =
     val m = Proj[2](0)
     val n = Proj[2](1)
     val res = caseStudy(
-        m                   +: n                    +: min +: VNil,
+        m         +: n          +: min +: VNil,
         (n ?= 0)  +: (m ?= 0)   +: VNil
     )
     UserDefined("minNotZero", res)
