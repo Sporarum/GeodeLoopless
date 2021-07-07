@@ -48,7 +48,8 @@ def max: PrimRecFun[2] = UserDefined("max",
         smallerSet +: VNil
     ))
 //X :+ y -> combination from t=0 to t<y of leaf(X :+ t), with z as zero element => combine(leaf(X :+ (y-1)), ... combine(leaf(X :+ 1), combine(leaf(X :+ 0), z))...)
-def exclusiveFold[A <: Arity](zero: PrimRecFun[P[A]], combine: PrimRecFun[2], leaf: PrimRecFun[A])(using a: A): PrimRecFun[A] =
+def exclusiveFold[A <: Arity](zero: PrimRecFun[P[A]], combine: PrimRecFun[2], leaf: PrimRecFun[A]): PrimRecFun[A] =
+    val a: A = leaf.arity
     // X :+ t :+ acc -> leaf(X :+ t)
     def leafTweaked: PrimRecFun[S[A]] = Comp(leaf, Vector.filled[PrimRecFun[S[A]], A](a)(i => Proj(i))) //TODO: replace when variable substitution added
     // X :+ t :+ acc -> combine(leaf(X :+ t), acc)
@@ -59,18 +60,19 @@ def exclusiveFold[A <: Arity](zero: PrimRecFun[P[A]], combine: PrimRecFun[2], le
     UserDefined(s"exclusiveFold($zero, $combine, $leaf)", res)
 
 //X :+ y -> combination from t=0 to t=y of leaf(X :+ t), with zero as zero element => combine(leaf(X :+ y), ... combine(leaf(X :+ 1), combine(leaf(X :+ 0), zero))...)
-def fold[A <: Arity](zero: PrimRecFun[P[A]], combine: PrimRecFun[2], leaf: PrimRecFun[A])(using a: A): PrimRecFun[A] =
+def fold[A <: Arity](zero: PrimRecFun[P[A]], combine: PrimRecFun[2], leaf: PrimRecFun[A]): PrimRecFun[A] =
+    val a: A = leaf.arity
     //increments y by 1
     def inc(i: Arity): PrimRecFun[A] = if i == a-1 then Succ(Proj[A](i)) else Proj(i)
     val res: PrimRecFun[A] = Comp(exclusiveFold(zero, combine, leaf), Vector.filled[PrimRecFun[A], A](a)(inc))
     UserDefined(s"fold($zero, $combine, $leaf)", res)
 
 //X :+ y -> sum from t=0 to t<y of f(X :+ t)
-def sum[A <: Arity](f: PrimRecFun[A])(using a: A): PrimRecFun[A] =
+def sum[A <: Arity](f: PrimRecFun[A]): PrimRecFun[A] =
     fold(zero = Const[P[A]](0), combine = add, leaf = f)
 
 //X :+ y -> product from t=0 to t<y of f(X :+ t)
-def product[A <: Arity](f: PrimRecFun[A])(using a: A): PrimRecFun[A] =
+def product[A <: Arity](f: PrimRecFun[A]): PrimRecFun[A] =
     fold(zero = Const[P[A]](1), combine = mult, leaf = f)
 
 def minNotZero: PrimRecFun[2] = 
@@ -84,14 +86,15 @@ def minNotZero: PrimRecFun[2] =
 
 //f(X :+ z) = 0 if for all t <= z: (X :+ t) not in A
 //f(X :+ z) = S(t) for minimal t <= z s.t. (X :+ t) in A
-def boundedMinPlusOne[A <: Arity](set: PrimRecSet[A])(using a: A): PrimRecFun[A] =
+def boundedMinPlusOne[A <: Arity](set: PrimRecSet[A]): PrimRecFun[A] =
+    val a: A = set.arity
     val t: PrimRecFun[A] = Proj(minusOne(a))
     val checkAndReturn: PrimRecFun[A] = Succ(t) * set.chi
     fold(zero = 0, combine = minNotZero, leaf = checkAndReturn)
 
 //f(X :+ z) = 0 if for all t <= z: (X :+ t) not in A
 //f(X :+ z) = t for minimal t <= z s.t. (X :+ t) in A
-def boundedMin[A <: Arity](set: PrimRecSet[A])(using a: A): PrimRecFun[A] = pred on boundedMinPlusOne(set)
+def boundedMin[A <: Arity](set: PrimRecSet[A]): PrimRecFun[A] = pred on boundedMinPlusOne(set)
 
 
 extension[A <: Arity] (f0: PrimRecFun[A])
