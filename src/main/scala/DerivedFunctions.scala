@@ -98,7 +98,9 @@ extension[A <: Arity] (f0: PrimRecFun[A])
     inline def +(f1: PrimRecFun[A]) = add on (f0, f1)
     inline def ∸(f1: PrimRecFun[A]) = subDot on (f0, f1)
     inline def *(f1: PrimRecFun[A]) = mult on (f0, f1)
-    inline def ^(n: Nat) = exp(n) on f0
     inline def ! = fact on f0
     //inline def ? = sign on f0 //Keep this ?
     //inline def unary_¬() = not on f0 // not working for some reason
+
+extension (n: Nat)
+    inline def ^[A <: Arity](f1: PrimRecFun[A]) = exp(n) on f1
