@@ -7,7 +7,7 @@ Geode Loopless (GeodeL) is a Domain Specific Language that aims at facilitating 
 
 This DSL is embedded in Scala, and aims to use its strong type system to enforce the arity and type of the `PrimRec` functions and sets, thus ensuring any function or set is really primitive recursive.
 
-Primitive recursive functions are all the functions that can be created by combining the successor function on naturals and constants with projection, recursion, and composition.
+Primitive recursive functions are all the functions on naturals that can be created by combining constants, projections, and the successor function through recursion and composition.
 
 In Scala, this translates to the following ([the actual implementation](src/main/scala/PrimRecFun.scala) also includes a "stack trace" method `debug`):
 ```scala
