@@ -7,6 +7,8 @@ Geode Loopless (GeodeL) is a Domain Specific Language that aims at facilitating 
 
 This DSL is embedded in Scala, and aims to use its strong type system to enforce the arity and type of the `PrimRec` functions and sets, thus ensuring any function or set is really primitive recursive.
 
+#### Primitive recursive ?
+
 Primitive recursive functions are all the functions on naturals that can be created by combining constants, projections, and the successor function through recursion and composition.
 
 In Scala, this translates to the following ([the actual implementation](src/main/scala/PrimRecFun.scala) also includes a "stack trace" method `debug`):
@@ -18,22 +20,27 @@ sealed trait PrimRecFun[A <: Arity]:
   val arity: A = valueOf[A]
   def apply(args: V): Nat
 
-//f(X) = constant
+// Constants
+// f(X) = constant
 sealed case class Const[A <: Arity](val constant: Nat) extends PrimRecFun[A]:
   def apply(args: V) = constant
 
-//f(X) = x_n
+// Projections
+// f(X) = x_n
 sealed case class Proj[A <: Arity](val n: Arity) extends PrimRecFun[A]:
   def apply(args: V) = args(n)
 
-//f(x) = Succ(x)
+// Successor
+// f(x) = Succ(x)
 case object Succ extends PrimRecFun[1]:
   def apply(args: V) = SuccNat(args(0))
 
-//f(X) = g(f_1(X), f_2(X), ... , f_ArityG(X)) with X a vector of arity ArityFs
+// Compostition
+// f(X) = g(f_1(X), f_2(X), ... , f_ArityG(X)) with X a vector of arity ArityFs
 sealed case class Comp[ArityG <: Arity, ArityFs <: Arity](g: PrimRecFun[ArityG], fs: Vector[PrimRecFun[ArityFs], ArityG]) extends PrimRecFun[ArityFs]:
   def apply(args: V) = g(fs.map(f => f(args)))
 
+// Recursion
 // f(X :+ 0) = init(X) with X a vector of arity A-1
 // f(X :+ S(n)) = step(X :+ n :+ f(X :+ n))
 sealed case class Rec[A <: Arity](base: PrimRecFun[P[A]], step: PrimRecFun[S[A]]) extends PrimRecFun[A]:
